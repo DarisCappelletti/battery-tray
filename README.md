@@ -61,3 +61,7 @@ Stored in `%APPDATA%\BTDeviceBattery\settings.json`, written atomically. Per-dev
 ## Troubleshooting
 
 `BTDeviceBattery.exe --dump` prints the raw PnP scan, connect states, BLE interfaces and HID report data — to the console (when launched from one) and to `%TEMP%\btdevicebattery-dump.txt`. A rolling state log lives at `%APPDATA%\BTDeviceBattery\log.txt`.
+
+## License
+
+[MIT](LICENSE)
