@@ -1,0 +1,120 @@
+<ui:FluentWindow x:Class="BTDeviceBattery.Views.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:conv="clr-namespace:BTDeviceBattery.Converters"
+                 Title="BT Device Battery"
+                 Width="560" Height="680" MinWidth="480"
+                 WindowStartupLocation="CenterScreen"
+                 ExtendsContentIntoTitleBar="True">
+
+    <ui:FluentWindow.Resources>
+        <conv:LevelToTextConverter x:Key="LevelToText" />
+        <conv:LevelToBrushConverter x:Key="LevelToBrush" />
+        <conv:BoolToStateConverter x:Key="BoolToState" />
+    </ui:FluentWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="BT Device Battery — Settings" />
+
+        <ScrollViewer Grid.Row="1" Padding="20,8,20,20">
+            <StackPanel>
+
+                <!-- Devices -->
+                <TextBlock Text="Devices"
+                           FontSize="16" FontWeight="SemiBold" Margin="0,8,0,8" />
+                <ItemsControl ItemsSource="{Binding Devices}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{DynamicResource ControlFillColorDefaultBrush}"
+                                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                    BorderThickness="1" CornerRadius="8"
+                                    Padding="12" Margin="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" MinWidth="56" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ui:TextBox Grid.Column="0" Text="{Binding Glyph, UpdateSourceTrigger=PropertyChanged}"
+                                                PlaceholderText="🎮" Width="44" Margin="0,0,8,0" FontSize="16"
+                                                ToolTip="Icon shown in the tray menu (emoji or a character)" />
+
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
+                                        <ui:TextBox Text="{Binding CustomName, UpdateSourceTrigger=PropertyChanged}"
+                                                    PlaceholderText="Custom name"
+                                                    ToolTip="Custom display name (leave empty to use the device name)" />
+                                        <TextBlock Text="{Binding Name}" FontSize="11" Opacity="0.6"
+                                                   ToolTip="Actual device name" />
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="0,0,12,0"
+                                               FontSize="15" FontWeight="SemiBold"
+                                               Text="{Binding Device.Level, Converter={StaticResource LevelToText}, Mode=OneWay}"
+                                               Foreground="{Binding Device.Level, Converter={StaticResource LevelToBrush}, Mode=OneWay}" />
+
+                                    <TextBlock Grid.Column="3" VerticalAlignment="Center" Margin="0,0,12,0"
+                                               FontSize="11" Opacity="0.6"
+                                               Text="{Binding Device.IsConnected, Mode=OneWay, Converter={StaticResource BoolToState}}" />
+
+                                    <ui:ToggleSwitch Grid.Column="4" VerticalAlignment="Center"
+                                                     IsChecked="{Binding NotificationsEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                                     ToolTip="Notifications for this device" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Notifications -->
+                <TextBlock Text="Notifications" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,8" />
+                <ui:ToggleSwitch Content="Low battery warning"
+                                 IsChecked="{Binding NotifyLowBattery, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,8" />
+                <StackPanel Orientation="Horizontal" Margin="24,0,0,8">
+                    <TextBlock Text="Warn at" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBox Text="{Binding LowBatteryThreshold, UpdateSourceTrigger=PropertyChanged}" Width="56" />
+                    <TextBlock Text="% battery" VerticalAlignment="Center" Margin="8,0,0,0" Opacity="0.6" />
+                </StackPanel>
+                <ui:ToggleSwitch Content="When a device connects"
+                                 IsChecked="{Binding NotifyOnConnect, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="0,0,0,8" />
+                <ui:ToggleSwitch Content="When a device disconnects"
+                                 IsChecked="{Binding NotifyOnDisconnect, UpdateSourceTrigger=PropertyChanged}" />
+
+                <!-- Polling -->
+                <TextBlock Text="Polling" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,8" />
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Classic/HFP refresh every" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBox Text="{Binding ClassicPollSeconds, UpdateSourceTrigger=PropertyChanged}" Width="56" />
+                    <TextBlock Text="seconds (10–3600)" VerticalAlignment="Center" Margin="8,0,0,0" Opacity="0.6" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="GATT refresh every" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBox Text="{Binding BlePollMinutes, UpdateSourceTrigger=PropertyChanged}" Width="56" />
+                    <TextBlock Text="minutes (1–60)" VerticalAlignment="Center" Margin="8,0,0,0" Opacity="0.6" />
+                </StackPanel>
+
+                <!-- Controllers -->
+                <TextBlock Text="Controllers" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,8" />
+                <ui:ToggleSwitch Content="DualSense: switch to enhanced reports for battery"
+                                 IsChecked="{Binding ControllerEnhancedReports, UpdateSourceTrigger=PropertyChanged}"
+                                 ToolTip="Off (recommended): battery appears only when the pad is already in enhanced mode (e.g. Steam running). On: force the switch — breaks DirectInput games until the controller is power-cycled." />
+
+                <!-- Startup -->
+                <TextBlock Text="Startup" FontSize="16" FontWeight="SemiBold" Margin="0,16,0,8" />
+                <ui:ToggleSwitch Content="Run automatically at Windows startup"
+                                 IsChecked="{Binding RunAtStartup, UpdateSourceTrigger=PropertyChanged}" />
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</ui:FluentWindow>
